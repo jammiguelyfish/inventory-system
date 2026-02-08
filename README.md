@@ -1,6 +1,6 @@
 # Laundry Shop Inventory Management System [WORK IN PROGRESS]
 
-A full-stack web application for managing inventory in a laundry shop. Built with Java Spring Boot backend and vanilla JavaScript frontend.
+A full-stack web application for managing inventory. Built with Java Spring Boot backend and vanilla JavaScript frontend. In this code, a laundry shop was used as an example for the inventory.
 
 ## Features
 
@@ -104,7 +104,7 @@ If you prefer to run without Docker:
 #### 1. Clone or Download the Project
 
 ```bash
-cd laundry-inventory
+cd inventory-system
 ```
 
 #### 2. Set Up PostgreSQL Database
