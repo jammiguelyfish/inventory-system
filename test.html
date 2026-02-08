@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry Shop Inventory System</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧺 Laundry Shop Inventory</h1>
+            <p class="subtitle">Manage your supplies and equipment</p>
+        </header>
+
+        <!-- Alert for Low Stock -->
+        <div id="lowStockAlert" class="alert alert-warning" style="display: none;">
+            <strong>⚠️ Low Stock Alert:</strong> <span id="lowStockCount">0</span> items need restocking
+            <button onclick="showLowStock()" class="btn-link">View Items</button>
+        </div>
+
+        <!-- Filter and Search Section -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search items..." onkeyup="searchItems()">
+                <button onclick="searchItems()" class="btn btn-secondary">🔍 Search</button>
+            </div>
+            
+            <div class="filter-box">
+                <select id="categoryFilter" onchange="filterByCategory()">
+                    <option value="">All Categories</option>
+                    <option value="Detergent">Detergent</option>
+                    <option value="Fabric Softener">Fabric Softener</option>
+                    <option value="Bleach">Bleach</option>
+                    <option value="Stain Remover">Stain Remover</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Packaging">Packaging</option>
+                    <option value="Other Supplies">Other Supplies</option>
+                </select>
+            </div>
+
+            <button onclick="openAddModal()" class="btn btn-primary">➕ Add New Item</button>
+            <button onclick="loadAllItems()" class="btn btn-secondary">🔄 Refresh</button>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="table-container">
+            <table id="inventoryTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Price/Unit</th>
+                        <th>Min. Stock</th>
+                        <th>Supplier</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div id="itemModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add New Item</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+                <form id="itemForm" onsubmit="saveItem(event)">
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCategory">Category *</label>
+                            <select id="itemCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Detergent">Detergent</option>
+                                <option value="Fabric Softener">Fabric Softener</option>
+                                <option value="Bleach">Bleach</option>
+                                <option value="Stain Remover">Stain Remover</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Packaging">Packaging</option>
+                                <option value="Other Supplies">Other Supplies</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="itemUnit">Unit *</label>
+                            <select id="itemUnit" required>
+                                <option value="">Select Unit</option>
+                                <option value="bottles">Bottles</option>
+                                <option value="kg">Kilograms</option>
+                                <option value="liters">Liters</option>
+                                <option value="pieces">Pieces</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="rolls">Rolls</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemQuantity">Quantity *</label>
+                            <input type="number" id="itemQuantity" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="itemMinStock">Minimum Stock</label>
+                            <input type="number" id="itemMinStock" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemPrice">Price per Unit</label>
+                            <input type="number" id="itemPrice" step="0.01" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="itemSupplier">Supplier</label>
+                            <input type="text" id="itemSupplier">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <textarea id="itemDescription" rows="3"></textarea>
+                    </div>
+
+                    <input type="hidden" id="itemId">
+
+                    <div class="modal-footer">
+                        <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stock Adjustment Modal -->
+        <div id="stockModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Adjust Stock</h2>
+                    <span class="close" onclick="closeStockModal()">&times;</span>
+                </div>
+                <div class="stock-info">
+                    <p><strong>Item:</strong> <span id="stockItemName"></span></p>
+                    <p><strong>Current Stock:</strong> <span id="stockCurrentQty"></span> <span id="stockUnit"></span></p>
+                </div>
+                <form id="stockForm" onsubmit="adjustStock(event)">
+                    <div class="form-group">
+                        <label>Adjustment Type</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="adjustmentType" value="add" checked>
+                                Add Stock (Received)
+                            </label>
+                            <label>
+                                <input type="radio" name="adjustmentType" value="remove">
+                                Remove Stock (Used)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stockQuantity">Quantity</label>
+                        <input type="number" id="stockQuantity" min="1" required>
+                    </div>
+
+                    <input type="hidden" id="stockItemId">
+
+                    <div class="modal-footer">
+                        <button type="button" onclick="closeStockModal()" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
