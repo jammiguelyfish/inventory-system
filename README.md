@@ -320,7 +320,7 @@ java -jar target/inventory-1.0.0.jar
 
 ## License
 
-This project is open source and available for educational purposes.
+Released under the [MIT License](LICENSE).
 
 
 
